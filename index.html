@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bagan Turnamen 9 Tim</title>
+    <style>
+        /* 1. Global & Tata Letak */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        /* * Kontainer utama bagan 
+         * Menggunakan flexbox untuk menata 'round' secara horizontal
+         * overflow-x: auto membuatnya responsif di layar kecil (bisa di-scroll)
+        */
+        .bracket-container {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* * 'round' adalah kolom (misal: Babak 1, Perempat Final, dst.)
+         * flex: 1 membuatnya berbagi ruang secara merata
+         * justify-content: space-around adalah kunci untuk menyejajarkan pertandingan
+        */
+        .round {
+            flex: 1;
+            min-width: 220px; /* Lebar minimum untuk setiap kolom */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; /* Menata pertandingan secara vertikal */
+            padding: 0 10px;
+        }
+
+        .round h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* 2. Pertandingan & Tim */
+
+        /* * 'matchup' adalah kotak untuk 2 tim
+         * position: relative penting untuk garis konektor
+        */
+        .matchup {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin: 10px 0;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        /* 'team' adalah slot untuk satu tim */
+        .team {
+            padding: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            color: #333;
+        }
+        
+        .team:first-child {
+            border-bottom: 1px solid #eee;
+        }
+
+        .team:hover:not(.placeholder):not(.bye) {
+            background-color: #f0f8ff; /* Biru muda saat hover */
+        }
+
+        /* Status tim */
+        .team.winner {
+            font-weight: 700;
+            color: #28a745; /* Hijau */
+        }
+
+        .team.placeholder {
+            color: #aaa;
+            font-style: italic;
+            cursor: not-allowed;
+        }
+
+        .team.bye {
+            color: #999;
+            font-style: italic;
+            cursor: default;
+        }
+
+        /* 3. Garis Konektor Sederhana 
+         * Menggunakan pseudo-element ::after dan ::before
+        */
+
+        /* Garis horizontal keluar dari setiap pertandingan */
+        .matchup::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            width: 15px; /* Panjang garis horizontal */
+            height: 2px;
+            background: #ccc;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        /* Garis vertikal menghubungkan pertandingan */
+        .round:not(:first-child) .matchup::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            width: 2px;
+            height: 102%; /* Sedikit lebih untuk overlap */
+            background: #ccc;
+            z-index: 1;
+        }
+
+        /* Sesuaikan garis vertikal untuk ganjil & genap */
+        .round:not(:first-child) .matchup:nth-child(odd)::before {
+            top: 50%;
+        }
+
+        .round:not(:first-child) .matchup:nth-child(even)::before {
+            bottom: 50%;
+        }
+        
+        /* Hapus garis untuk babak final & juara */
+        .round.final .matchup::before,
+        .round.winner .matchup::before,
+        .round.winner .matchup::after {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Bagan Turnamen 9 Tim</h1>
+
+    <div class="bracket-container">
+
+        <div class="round">
+            <h3>Babak 1</h3>
+            <div class="matchup">
+                <div class="team" data-winner-target="qf-1-top">Tim 1 (Seed 1)</div>
+                <div class="team bye">BYE</div>
+            </div>
+            <div class="matchup">
+                <div class="team" data-winner-target="qf-1-bottom">Tim 8 (Seed 8)</div>
+                <div class="team" data-winner-target="qf-1-bottom">Tim 9 (Seed 9)</div>
+            </div>
+            <div class="matchup">
+                <div class="team" data-winner-target="qf-2-top">Tim 4 (Seed 4)</div>
+                <div class="team bye">BYE</div>
+            </div>
+            <div class="matchup">
+                <div class="team" data-winner-target="qf-2-bottom">Tim 5 (Seed 5)</div>
+                <div class="team bye">BYE</div>
+            </div>
+            <div class="matchup">
+                <div class="team" data-winner-target="qf-3-top">Tim 2 (Seed 2)</div>
+                <div class="team bye">BYE</div>
+            </div>
+            <div class="matchup">
+                <div class="team" data-winner-target="qf-3-bottom">Tim 7 (Seed 7)</div>
+                <div class="team bye">BYE</div>
+            </div>
+            <div class="matchup">
+                <div class="team" data-winner-target="qf-4-top">Tim 3 (Seed 3)</div>
+                <div class="team bye">BYE</div>
+            </div>
+            <div class="matchup">
+                <div class="team" data-winner-target="qf-4-bottom">Tim 6 (Seed 6)</div>
+                <div class="team bye">BYE</div>
+            </div>
+        </div>
+
+        <div class="round">
+            <h3>Perempat Final</h3>
+            <div class="matchup">
+                <div class="team placeholder" id="qf-1-top" data-winner-target="sf-1-top">...</div>
+                <div class="team placeholder" id="qf-1-bottom" data-winner-target="sf-1-top">...</div>
+            </div>
+            <div class="matchup">
+                <div class="team placeholder" id="qf-2-top" data-winner-target="sf-1-bottom">...</div>
+                <div class="team placeholder" id="qf-2-bottom" data-winner-target="sf-1-bottom">...</div>
+            </div>
+            <div class="matchup">
+                <div class="team placeholder" id="qf-3-top" data-winner-target="sf-2-top">...</div>
+                <div class="team placeholder" id="qf-3-bottom" data-winner-target="sf-2-top">...</div>
+            </div>
+            <div class="matchup">
+                <div class="team placeholder" id="qf-4-top" data-winner-target="sf-2-bottom">...</div>
+                <div class="team placeholder" id="qf-4-bottom" data-winner-target="sf-2-bottom">...</div>
+            </div>
+        </div>
+
+        <div class="round">
+            <h3>Semifinal</h3>
+            <div class="matchup">
+                <div class="team placeholder" id="sf-1-top" data-winner-target="f-1-top">...</div>
+                <div class="team placeholder" id="sf-1-bottom" data-winner-target="f-1-top">...</div>
+            </div>
+            <div class="matchup">
+                <div class="team placeholder" id="sf-2-top" data-winner-target="f-1-bottom">...</div>
+                <div class="team placeholder" id="sf-2-bottom" data-winner-target="f-1-bottom">...</div>
+            </div>
+        </div>
+
+        <div class="round final">
+            <h3>Final</h3>
+            <div class="matchup">
+                <div class="team placeholder" id="f-1-top" data-winner-target="w-1">...</div>
+                <div class="team placeholder" id="f-1-bottom" data-winner-target="w-1">...</div>
+            </div>
+        </div>
+
+        <div class="round winner">
+            <h3>Juara</h3>
+            <div class="matchup">
+                <div class="team placeholder" id="w-1">...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // 1. Fungsi untuk memajukan pemenang
+            function advanceWinner(winningTeam) {
+                const matchup = winningTeam.closest('.matchup');
+                
+                // Simpan nama asli jika belum ada (untuk menghindari "...")
+                if (!winningTeam.dataset.teamName) {
+                    winningTeam.dataset.teamName = winningTeam.textContent;
+                }
+                const teamName = winningTeam.dataset.teamName;
+
+                // 1. Tandai sebagai pemenang di pertandingan saat ini
+                matchup.querySelectorAll('.team').forEach(t => t.classList.remove('winner'));
+                winningTeam.classList.add('winner');
+
+                // 2. Cari slot target di babak berikutnya
+                const targetId = winningTeam.dataset.winnerTarget;
+                if (targetId) {
+                    const targetSlot = document.getElementById(targetId);
+                    if (targetSlot) {
+                        // 3. Isi slot target dengan nama pemenang
+                        targetSlot.textContent = teamName;
+                        targetSlot.dataset.teamName = teamName; // Simpan nama untuk babak selanjutnya
+                        targetSlot.classList.remove('placeholder');
+
+                        // 4. Periksa apakah lawan di babak baru adalah 'BYE'
+                        checkAutoAdvance(targetSlot);
+                    }
+                }
+            }
+
+            // 2. Fungsi untuk memeriksa BYE di babak *berikutnya*
+            function checkAutoAdvance(filledSlot) {
+                const nextMatchup = filledSlot.closest('.matchup');
+                
+                // Cari slot lawan di pertandingan yang sama
+                const opponentSlot = Array.from(nextMatchup.querySelectorAll('.team'))
+                                        .find(t => t.id !== filledSlot.id);
+                
+                // Jika lawan adalah BYE, langsung majukan tim yang baru diisi
+                if (opponentSlot && opponentSlot.classList.contains('bye')) {
+                    // Beri sedikit jeda agar terlihat
+                    setTimeout(() => {
+                        advanceWinner(filledSlot);
+                    }, 50); 
+                }
+            }
+
+            // 3. Otomatis majukan semua tim yang melawan 'BYE' saat halaman dimuat
+            document.querySelectorAll('.team.bye').forEach(byeSlot => {
+                const matchup = byeSlot.closest('.matchup');
+                const opponent = matchup.querySelector('.team:not(.bye)');
+                
+                if (opponent) {
+                    // Langsung majukan lawan dari BYE
+                    advanceWinner(opponent);
+                }
+            });
+
+            // 4. Tambahkan event listener ke seluruh kontainer (Event Delegation)
+            document.querySelector('.bracket-container').addEventListener('click', (e) => {
+                // Hanya jalankan jika yang diklik adalah .team, dan bukan .placeholder atau .bye
+                if (e.target.classList.contains('team') &&
+                    !e.target.classList.contains('placeholder') &&
+                    !e.target.classList.contains('bye')) {
+                    
+                    advanceWinner(e.target);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
